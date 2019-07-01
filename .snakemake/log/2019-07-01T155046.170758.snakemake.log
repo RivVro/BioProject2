@@ -11,5 +11,6 @@ rule all:
     output: outputVariants.txt
     jobid: 0
 
-Finished job 0.
-1 of 1 steps (100%) done
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2019-07-01T155046.170758.snakemake.log
