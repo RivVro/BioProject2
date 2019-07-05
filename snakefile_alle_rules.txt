@@ -1,0 +1,44 @@
+rule input_selectdata:		# rule voor het verkrijgen van geschikte data voor de database
+	input:
+		'gnomad.exomes.r2.1.1.sites.Y.vcf' # vcf bestand dat alle gnomaddata bevat
+	output:
+		'LijstSNP.txt' # bestand dat alle gefilterde data (<0,01) voor in de database bevat
+	run:
+		with open(input[0],"r") as f: 		# relevante data voor in de database uit het vcf bestand halen.
+			line = f.readline()
+			waarden = line.split(",")
+			chrom = waarden[0]
+			pos = waarden[1]
+			aft = waarden[2].replace("\n", "")
+			shell("wget 'http://0.0.0.0:5000/?chrom={chrom}&pos={pos}&aft={aft}' --output-document {output} ")
+
+rule input_databasedata:	# rule voor vullen van de database
+    input:
+		txtLijstSNP = "LijstSNP.txt",	# bestand dat alle data voor de database bevat
+		pythonvullendb = "vulDatabase.py" 	# bestand voor het vullen van de database (bevat sql statemnets)
+	output:
+        "output.txt"
+    shell:
+        "python3 {input.pythonvullendb}{input.txtLijstSNP}> {output}"
+		
+		
+		# !!!!rule die output vullen database linkt aan rule raadplegen database!!!!
+
+
+rule input_outputdata:		# rule voor het raadplegen van de database
+    input:
+		txtInputUser = "InputUser.txt",	# bestand dat de opgegeven user input bevat
+		pythonraadpleegdb = "app.py" 	# bestand dat het sql statement bevat om de gevraagde gegevens uit de database op te halen
+    output:
+        "outputdb.txt"					# bestand dat de output van het raadplegen vd database bevat
+    shell:
+        "python3 {input.pythonraadpleegdb}{input.txtInputUser} > {output}"
+		
+#rule input_validatedata:		# rule voor valideren van de data
+    #input:
+		#txtoutputdb = "outputdb.txt",	# bestand dat data behorend bij de input van de gebruiker bevat
+		#ClinvarResult = "getClinvarResult.py" 	# bestand dat mbv de SNPid het valideerd in Clinvar
+    #output:
+        #"ClinvarResults.txt"	# bestand dat de gevonden clinvar resultaten bevat
+    #shell:
+        #"python3 {input.ClinvarResult}{input.txtoutputdb} > {output}"
