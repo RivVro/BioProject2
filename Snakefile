@@ -15,6 +15,6 @@ rule ophalen_data:
 rule input_databasedata:
 	input:
 		txtbestand = "lijstSNP.txt",
-		pythonbestand = "pythonbestand"
+		pythonbestand = "app.py"
 	shell:
 		"python3 {input.pythonbestand}{input.txtbestand}"
